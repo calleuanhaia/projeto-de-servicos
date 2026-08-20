@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Acesso - Projeto Serviços</title>
+  <!-- Importando o Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center font-sans text-slate-300 my-8">
+
+  <div class="bg-slate-800 p-8 rounded-lg shadow-2xl border border-yellow-600 w-96 relative overflow-hidden">
+    
+    <!-- Detalhe visual de borda superior dourada -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+
+    <!-- Abas de Navegação -->
+    <div class="flex justify-between mb-4 border-b border-slate-700 pb-2">
+      <button type="button" id="btnAbaLogin" class="text-yellow-500 font-bold transition-colors">Login</button>
+      <button type="button" id="btnAbaRegistro" class="text-slate-500 hover:text-yellow-400 font-bold transition-colors">Criar Conta</button>
+    </div>
+
+    <h2 id="tituloForm" class="text-3xl font-bold text-center text-yellow-500 mb-6 uppercase tracking-wider">Acesso</h2>
+
+    <!-- Formulário Único -->
+    <form id="authForm" class="space-y-4">
+      
+      <!-- Tipo de Usuário (Cliente ou Trabalhador) -->
+      <div>
+        <label class="block text-sm font-semibold text-yellow-600 mb-1" for="tipo">Tipo de Perfil</label>
+        <select id="tipo" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required>
+          <option value="cliente">Cliente</option>
+          <option value="trabalhador">Trabalhador</option>
+        </select>
+      </div>
+
+      <!-- Usuário / Login -->
+      <div>
+        <label class="block text-sm font-semibold text-yellow-600 mb-1" for="usuario">Usuário</label>
+        <input type="text" id="usuario" placeholder="Nome de usuário" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required>
+      </div>
+
+      <!-- Campos Exclusivos do Registro (Ocultos no Login) -->
+      <div id="camposRegistro" class="space-y-4 hidden">
+        <div>
+          <label class="block text-sm font-semibold text-yellow-600 mb-1" for="email">E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-yellow-600 mb-1" for="telefone">Telefone</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-yellow-600 mb-1" for="cpf">CPF</label>
+          <input type="text" id="cpf" placeholder="Apenas números (11 dígitos)" maxlength="11" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors">
+        </div>
+      </div>
+
+      <!-- Senha -->
+      <div>
+        <label class="block text-sm font-semibold text-yellow-600 mb-1" for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="••••••••" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required>
+      </div>
+
+      <button type="submit" id="btnSubmit" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded transition-colors uppercase tracking-wide mt-4">
+        Entrar
+      </button>
+    </form>
+
+    <!-- Exibição de Mensagens -->
+    <div id="mensagem" class="mt-4 text-center text-sm font-bold hidden"></div>
+  </div>
+
+  <!-- Lógica de comunicação com o Back-End -->
+  <script>
+    const authForm = document.getElementById('authForm');
+    const btnAbaLogin = document.getElementById('btnAbaLogin');
+    const btnAbaRegistro = document.getElementById('btnAbaRegistro');
+    const tituloForm = document.getElementById('tituloForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const msgDiv = document.getElementById('mensagem');
+    const camposRegistro = document.getElementById('camposRegistro');
+    const inputsRegistro = camposRegistro.querySelectorAll('input');
+
+    let modoLogin = true; // Controla o modo atual (Login ou Registro)
+    
+
+    // Alterna para o modo de Registro
+    btnAbaRegistro.addEventListener('click', () => {
+      modoLogin = false;
+      tituloForm.textContent = 'Nova Conta';
+      btnSubmit.textContent = 'Registrar';
+      
+      btnAbaRegistro.className = 'text-yellow-500 font-bold transition-colors';
+      btnAbaLogin.className = 'text-slate-500 hover:text-yellow-400 font-bold transition-colors';
+      
+      camposRegistro.classList.remove('hidden');
+      inputsRegistro.forEach(input => input.setAttribute('required', 'true'));
+      msgDiv.classList.add('hidden');
+    });
+
+    // Alterna para o modo de Login
+    btnAbaLogin.addEventListener('click', () => {
+      modoLogin = true;
+      tituloForm.textContent = 'Acesso';
+      btnSubmit.textContent = 'Entrar';
+
+      btnAbaLogin.className = 'text-yellow-500 font-bold transition-colors';
+      btnAbaRegistro.className = 'text-slate-500 hover:text-yellow-400 font-bold transition-colors';
+      
+      camposRegistro.classList.add('hidden');
+      inputsRegistro.forEach(input => input.removeAttribute('required'));
+      msgDiv.classList.add('hidden');
+    });
+
+    // Submissão do Formulário
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+      const tipo = document.getElementById('tipo').value;
+
+      // Monta o objeto base dos dados
+      const payload = { usuario, senha, tipo };
+
+      // Se estiver no modo Registro, adiciona os novos campos
+      if (!modoLogin) {
+        payload.email = document.getElementById('email').value;
+        payload.telefone = document.getElementById('telefone').value;
+        payload.cpf = document.getElementById('cpf').value;
+      }
+
+      const url = modoLogin ? '/login' : '/registrar';
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        msgDiv.classList.remove('hidden', 'text-red-500', 'text-green-500');
+
+        if (response.ok) {
+            msgDiv.classList.add('text-green-500');
+
+            if (modoLogin) {
+                msgDiv.textContent = 'Acesso Concedido! Redirecionando...';
+                
+                // 1. Salva os dados no navegador
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('tipoPerfil', data.tipo); // 'cliente' ou 'trabalhador'
+
+                localStorage.setItem('nomeUsuario', usuario);
+
+                // 2. Redireciona para a mesma tela base
+                setTimeout(() => {
+                window.location.href = 'home.html'; // Altere para o nome do seu arquivo
+                }, 1000);
+
+            } else {
+            msgDiv.textContent = data.mensagem || 'Conta criada com sucesso!';
+            setTimeout(() => {
+              btnAbaLogin.click(); // Redireciona para o login após cadastrar
+              document.getElementById('senha').value = '';
+            }, 1500);
+          }
+        } else {
+          msgDiv.textContent = 'Erro: ' + (data.erro || 'Falha na requisição.');
+          msgDiv.classList.add('text-red-500');
+        }
+      } catch (error) {
+        console.error('Erro de rede:', error);
+        msgDiv.textContent = 'Erro de conexão com o servidor.';
+        msgDiv.classList.remove('hidden');
+        msgDiv.classList.add('text-red-500');
+      }
+    });
+  </script>
+</body>
+</html>

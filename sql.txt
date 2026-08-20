@@ -1,0 +1,39 @@
+CREATE DATABASE projetoservicos;
+USE projetoservicos;
+
+select * from clientes;
+select * from trabalhadores;
+select * from servicos;
+
+CREATE TABLE clientes (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR (255),
+    email VARCHAR (255) UNIQUE,
+    telefone VARCHAR(255) UNIQUE,
+    senha VARCHAR (255),
+    cpf VARCHAR (11) UNIQUE,
+    status VARCHAR(255) DEFAULT "OFFLINE"
+);
+
+CREATE TABLE servicos (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_trabalhador INT NOT NULL,
+    descricao VARCHAR(255),
+    valor DECIMAL(10,2),
+    data_pedido DATE,
+    data_finalizado DATE,
+    status VARCHAR(255) DEFAULT "AGUARDANDO APROVAÇÃO",
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_trabalhador) REFERENCES trabalhadores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE trabalhadores (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR (255),
+    email VARCHAR (255) UNIQUE,
+    telefone VARCHAR(255) UNIQUE,
+    senha VARCHAR (255),
+    cpf VARCHAR (11) UNIQUE,
+    status VARCHAR(255) DEFAULT "OFFLINE"
+);

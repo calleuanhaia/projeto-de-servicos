@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel - Projeto Serviços</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans min-h-screen flex flex-col md:flex-row">
+
+  <!-- ========================================== -->
+  <!-- 1. MENU LATERAL (SIDEBAR)                  -->
+  <!-- ========================================== -->
+  <aside class="w-full md:w-64 bg-slate-800 border-r border-slate-700/60 flex flex-col justify-between p-4 relative">
+    
+    <!-- Detalhe superior em gradiente dourado -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+
+    <div>
+      <!-- LOGO / TITULO -->
+      <div class="flex items-center gap-3 py-4 border-b border-slate-700/60 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-yellow-600 text-slate-900 font-bold flex items-center justify-center text-xl shadow-lg">
+          PS
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-100 leading-tight">ProjetoServiços</h1>
+          <p id="nomeUsuarioDisplay" class="text-sm text-slate-200 mt-1 mb-1"></p>
+          <span id="badgeTipoPerfil" class="text-xs text-yellow-500 font-semibold uppercase tracking-wider">Carregando...</span>
+        </div>
+      </div>
+
+      <!-- LINKS DO MENU -->
+      <nav class="space-y-1">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-yellow-500 bg-slate-900/60 rounded-lg font-medium border-l-4 border-yellow-500 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6"/></svg>
+          Início / Painel
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Meus Serviços
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Novo Pedido
+        </a>
+
+        <!-- Botão visível APENAS para CLIENTES -->
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+        + Solicitar Novo Serviço
+        </a>
+
+        <!-- Link no Menu visível APENAS para TRABALHADORES -->
+        <a id="menuServicosDisponiveis" href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Serviços Disponíveis para Pegar
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Meu Perfil
+        </a>
+      </nav>
+    </div>
+
+    <!-- BOTÃO LOGOUT -->
+    <div class="pt-6 border-t border-slate-700/60 mt-6">
+      <button id="btnLogout" class="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-red-950/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800 font-semibold py-2 px-4 rounded-lg transition-all text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sair da Conta
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================== -->
+  <!-- 2. ÁREA PRINCIPAL (MAIN CONTENT)           -->
+  <!-- ========================================== -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="bg-slate-800 border-b border-slate-700/60 p-4 px-6 flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-slate-100">Visão Geral</h2>
+        <p class="text-xs text-slate-400">Bem-vindo(a) ao seu painel de controle</p>
+      </div>
+
+      <!-- INDICADOR DE STATUS -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-full text-xs">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-slate-300 font-medium">Status: ONLINE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTEÚDO DA PÁGINA -->
+    <div class="p-6 space-y-6 overflow-y-auto">
+
+      <!-- CARDS DE ESTATÍSTICAS / RESUMO -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        
+        <!-- Card 1 -->
+        <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-2 h-full bg-yellow-500"></div>
+          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Aguardando Aprovação</p>
+          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Serviços pendentes de resposta</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
+          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Em Andamento</p>
+          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Serviços sendo executados</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
+          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Concluídos</p>
+          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p class="text-xs text-slate-500 mt-1">Histórico de trabalhos finalizados</p>
+        </div>
+
+      </div>
+
+      <!-- TABELA / LISTA DE SERVIÇOS (EXEMPLO DE BASE) -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-6 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-yellow-500">Últimos Serviços</h3>
+          <button class="bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold px-3 py-2 rounded transition-all">
+            + Solicitar Serviço
+          </button>
+        </div>
+
+        <!-- Tabela Responsiva -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="text-xs uppercase bg-slate-900/80 text-yellow-600 border-b border-slate-700">
+              <tr>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Descrição</th>
+                <th class="px-4 py-3">Valor</th>
+                <th class="px-4 py-3">Data Pedido</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700/50">
+              <!-- Linha de exemplo em branco / sem dados -->
+              <tr>
+                <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
+                  Nenhum serviço registrado até o momento.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- 3. LÓGICA JAVASCRIPT DE AUTENTICAÇÃO      -->
+  <!-- ========================================== -->
+  <script>
+    // Executa ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const tipoPerfil = localStorage.getItem('tipoPerfil');
+
+      // Proteção de Rota: Se não tem token, manda de volta pro Login
+      if (!token) {
+        alert('Você precisa estar logado para acessar esta página!');
+        window.location.href = 'index.html'; // Ajuste o nome se seu HTML de login for diferente
+        return;
+      }
+
+      // Atualiza o Badge do Perfil na Sidebar
+      const badge = document.getElementById('badgeTipoPerfil');
+      if (tipoPerfil) {
+        badge.textContent = tipoPerfil === 'cliente' ? 'Perfil: Cliente' : 'Perfil: Trabalhador';
+      }
+    });
+
+    // Lógica de Logout (Sair)
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      if (confirm('Deseja realmente sair do sistema?')) {
+        localStorage.clear(); // Apaga o token e dados salvos
+        window.location.href = 'index.html'; // Redireciona para o login
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        const tipoPerfil = localStorage.getItem('tipoPerfil'); // 'cliente' ou 'trabalhador'
+
+        // Proteção de Rota
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Atualiza a badge no topo/sidebar
+        const badge = document.getElementById('badgeTipoPerfil');
+        if (badge) {
+            badge.textContent = tipoPerfil === 'cliente' ? 'Perfil: Cliente' : 'Perfil: Trabalhador';
+        }
+
+        // Busca o nome do cache do navegador
+        const nomeUsuario = localStorage.getItem('nomeUsuario'); 
+        
+        const displayNome = document.getElementById('nomeUsuarioDisplay');
+        
+        // Se encontrou a tag <p> e o nome salvo, ele escreve na tela
+        if (displayNome && nomeUsuario) {
+            displayNome.textContent = `Usuário: ${nomeUsuario}`;
+        }
+
+        // ==========================================
+        // CONTROLE DE PERMISSÕES NA INTERFACE
+        // ==========================================
+        const btnNovoServico = document.getElementById('btnNovoServico');
+        const menuServicosDisponiveis = document.getElementById('menuServicosDisponiveis');
+
+        if (tipoPerfil === 'cliente') {
+            // Coisas que SÓ O CLIENTE pode fazer:
+            if (btnNovoServico) btnNovoServico.classList.remove('hidden'); // Exibe o botão de pedir serviço
+            
+        } else if (tipoPerfil === 'trabalhador') {
+            // Coisas que SÓ O TRABALHADOR pode fazer:
+            if (menuServicosDisponiveis) menuServicosDisponiveis.classList.remove('hidden'); // Exibe menu de novos trabalhos
+        }
+        });
+  </script>
+</body>
+</html>
