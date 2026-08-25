@@ -4,6 +4,7 @@ USE projetoservicos;
 select * from clientes;
 select * from trabalhadores;
 select * from servicos;
+select * from servicos_oferecidos;
 
 CREATE TABLE clientes (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -25,6 +26,16 @@ CREATE TABLE servicos (
     data_finalizado DATE,
     status VARCHAR(255) DEFAULT "AGUARDANDO APROVAÇÃO",
     FOREIGN KEY (id_cliente) REFERENCES clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_trabalhador) REFERENCES trabalhadores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE servicos_oferecidos (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_trabalhador INT NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    preco DECIMAL(10,2) NOT NULL,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_trabalhador) REFERENCES trabalhadores(id) ON DELETE CASCADE
 );
 

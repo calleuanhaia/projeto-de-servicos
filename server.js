@@ -113,6 +113,78 @@ app.post('/login', (req, res) => {
   });
 });
 
+function autenticarToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ erro: 'Acesso negado. Token não fornecido.' });
+  }
+
+  jwt.verify(token, SECRET_KEY, (err, usuario) => {
+    if (err) return res.status(403).json({ erro: 'Token inválido ou expirado.' });
+    req.usuario = usuario;
+    next();
+  });
+}
+
+// ==========================================
+// ROTA 3: CADASTRO DE SERVIÇO OFERECIDO (Trabalhador)
+// ==========================================
+app.post('/servicos-oferecidos', autenticarToken, (req, res) => {
+  if (req.usuario.tipo !== 'trabalhador') {
+    return res.status(403).json({ erro: 'Apenas trabalhadores podem oferecer serviços.' });
+  }
+
+  const { titulo, descricao, preco } = req.body;
+  const id_trabalhador = req.usuario.id;
+
+  if (!titulo || !preco) {
+    return res.status(400).json({ erro: 'Título e Preço são obrigatórios.' });
+  }
+
+  const sql = `INSERT INTO servicos_oferecidos (id_trabalhador, titulo, descricao, preco) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [id_trabalhador, titulo, descricao, preco], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ erro: 'Erro ao cadastrar serviço no banco de dados.' });
+    }
+
+    res.status(201).json({
+      mensagem: 'Serviço cadastrado com sucesso!',
+      id_servico: result.insertId
+    });
+  });
+});
+
+// ==========================================
+// ROTA 4: LISTAR SERVIÇOS OFERECIDOS (Para o Feed do Cliente)
+// ==========================================
+app.get('/servicos-oferecidos', autenticarToken, (req, res) => {
+  const sql = `
+    SELECT 
+      so.id, 
+      so.titulo, 
+      so.descricao, 
+      so.preco, 
+      so.data_criacao,
+      t.usuario AS nome_trabalhador,
+      t.email AS email_trabalhador
+    FROM servicos_oferecidos so
+    INNER JOIN trabalhadores t ON so.id_trabalhador = t.id
+    ORDER BY so.id DESC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ erro: 'Erro ao carregar o feed de serviços.' });
+    }
+    res.json(results);
+  });
+});
+
 // 4. LIGANDO O SERVIDOR
 const PORT = 3000;
 app.listen(PORT, () => {

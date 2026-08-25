@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Serviço - Projeto Serviços</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans min-h-screen flex flex-col md:flex-row">
+
+  <!-- SIDEBAR -->
+  <aside class="w-full md:w-64 bg-slate-800 border-r border-slate-700/60 flex flex-col justify-between p-4 relative">
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+    <div>
+      <div class="flex items-center gap-3 py-4 border-b border-slate-700/60 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-yellow-600 text-slate-900 font-bold flex items-center justify-center text-xl shadow-lg">
+          PS
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-100 leading-tight">ProjetoServiços</h1>
+          <p id="nomeUsuarioDisplay" class="text-sm text-slate-200 mt-1 mb-1"></p>
+          <span id="badgeTipoPerfil" class="text-xs text-yellow-500 font-semibold uppercase tracking-wider">Perfil: Trabalhador</span>
+        </div>
+      </div>
+
+      <nav class="space-y-1">
+        <a href="home.html" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6"/></svg>
+          Início / Painel
+        </a>
+        <a href="cadastrar-servico.html" class="flex items-center gap-3 px-4 py-3 text-yellow-500 bg-slate-900/60 rounded-lg font-medium border-l-4 border-yellow-500 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Cadastrar Novo Serviço
+        </a>
+      </nav>
+    </div>
+
+    <div class="pt-6 border-t border-slate-700/60 mt-6">
+      <button id="btnLogout" class="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-red-950/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800 font-semibold py-2 px-4 rounded-lg transition-all text-sm">
+        Sair da Conta
+      </button>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <header class="bg-slate-800 border-b border-slate-700/60 p-4 px-6 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-slate-100">Novo Serviço Ofertado</h2>
+    </header>
+
+    <div class="p-6 overflow-y-auto">
+      <div class="max-w-2xl bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+        <h3 class="text-lg font-bold text-yellow-500 mb-4">Informações do Serviço</h3>
+        
+        <form id="formCadastrarServico" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1" for="titulo">Título do Serviço</label>
+            <input type="text" id="titulo" placeholder="Ex: Pintura Residencial, Formatação de PC..." class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1" for="preco">Preço Base Estimado (R$)</label>
+            <input type="number" step="0.01" id="preco" placeholder="150.00" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-1" for="descricao">Descrição Detalhada</label>
+            <textarea id="descricao" rows="4" placeholder="Descreva o que está incluso no seu serviço..." class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded focus:outline-none focus:border-yellow-500 text-slate-100 transition-colors" required></textarea>
+          </div>
+
+          <div class="flex items-center gap-4 pt-4">
+            <button type="submit" class="bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-6 rounded transition-colors uppercase tracking-wide">
+              Publicar Serviço
+            </button>
+            <a href="home.html" class="text-slate-400 hover:text-slate-200 text-sm font-medium">Cancelar</a>
+          </div>
+        </form>
+
+        <div id="mensagem" class="mt-4 text-center text-sm font-bold hidden"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const tipoPerfil = localStorage.getItem('tipoPerfil');
+      const nomeUsuario = localStorage.getItem('nomeUsuario');
+
+      if (!token || tipoPerfil !== 'trabalhador') {
+        alert('Acesso negado! Apenas trabalhadores podem acessar esta página.');
+        window.location.href = 'home.html';
+        return;
+      }
+
+      const displayNome = document.getElementById('nomeUsuarioDisplay');
+      if (displayNome && nomeUsuario) displayNome.textContent = `Usuário: ${nomeUsuario}`;
+    });
+
+    document.getElementById('formCadastrarServico').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const msgDiv = document.getElementById('mensagem');
+
+      const payload = {
+        titulo: document.getElementById('titulo').value,
+        preco: parseFloat(document.getElementById('preco').value),
+        descricao: document.getElementById('descricao').value
+      };
+
+      try {
+        const response = await fetch('/servicos-oferecidos', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        msgDiv.classList.remove('hidden', 'text-red-500', 'text-green-500');
+
+        if (response.ok) {
+          msgDiv.classList.add('text-green-500');
+          msgDiv.textContent = 'Serviço cadastrado com sucesso!';
+          document.getElementById('formCadastrarServico').reset();
+          setTimeout(() => window.location.href = 'home.html', 1500);
+        } else {
+          msgDiv.classList.add('text-red-500');
+          msgDiv.textContent = data.erro || 'Erro ao cadastrar serviço.';
+        }
+      } catch (err) {
+        msgDiv.classList.remove('hidden');
+        msgDiv.classList.add('text-red-500');
+        msgDiv.textContent = 'Erro na requisição ao servidor.';
+      }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      if (confirm('Deseja realmente sair?')) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

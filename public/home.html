@@ -48,7 +48,7 @@
         </a>
 
         <!-- Botão visível APENAS para CLIENTES -->
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+        <a id="btnNovoServico" href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
         + Solicitar Novo Serviço
         </a>
 
@@ -56,6 +56,11 @@
         <a id="menuServicosDisponiveis" href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         Serviços Disponíveis para Pegar
+        </a>
+
+        <a id="btnCadastrarNovoServico" href="cadastrar-servico.html" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          + Cadastrar Meu Serviço
         </a>
 
         <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
@@ -127,10 +132,27 @@
 
       </div>
 
+      <!-- ========================================== -->
+      <!-- FEED DE SERVIÇOS OFERECIDOS (VISÍVEL PARA CLIENTES) -->
+      <!-- ========================================== -->
+      <div id="secaoFeedServicos" class="hidden space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <div>
+            <h3 class="text-xl font-bold text-yellow-500">Catálogo de Serviços Disponíveis</h3>
+            <p class="text-xs text-slate-400">Explore e contrate serviços publicados por profissionais cadastrados</p>
+          </div>
+        </div>
+
+        <!-- Grid Container do Feed -->
+        <div id="containerFeedServicos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <p class="text-slate-400 italic text-sm col-span-full">Carregando serviços disponíveis...</p>
+        </div>
+      </div>
+
       <!-- TABELA / LISTA DE SERVIÇOS (EXEMPLO DE BASE) -->
       <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-6 shadow-lg">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold text-yellow-500">Últimos Serviços</h3>
+          <h3 class="text-lg font-bold text-yellow-500">Últimos Serviços Pedidos</h3>
           <button class="bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold px-3 py-2 rounded transition-all">
             + Solicitar Serviço
           </button>
@@ -172,70 +194,118 @@
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       const tipoPerfil = localStorage.getItem('tipoPerfil');
+      const nomeUsuario = localStorage.getItem('nomeUsuario');
 
       // Proteção de Rota: Se não tem token, manda de volta pro Login
       if (!token) {
         alert('Você precisa estar logado para acessar esta página!');
-        window.location.href = 'index.html'; // Ajuste o nome se seu HTML de login for diferente
+        window.location.href = 'index.html';
         return;
       }
 
       // Atualiza o Badge do Perfil na Sidebar
       const badge = document.getElementById('badgeTipoPerfil');
-      if (tipoPerfil) {
+      if (badge && tipoPerfil) {
         badge.textContent = tipoPerfil === 'cliente' ? 'Perfil: Cliente' : 'Perfil: Trabalhador';
       }
+
+      // Exibe o Nome do Usuário
+      const displayNome = document.getElementById('nomeUsuarioDisplay');
+      if (displayNome && nomeUsuario) {
+        displayNome.textContent = `Usuário: ${nomeUsuario}`;
+      }
+
+      // ==========================================
+      // CONTROLE DE PERMISSÕES NA INTERFACE
+      // ==========================================
+      const btnNovoServico = document.getElementById('btnNovoServico');
+      const menuServicosDisponiveis = document.getElementById('menuServicosDisponiveis');
+      const btnCadastrarNovoServico = document.getElementById('btnCadastrarNovoServico');
+      const secaoFeedServicos = document.getElementById('secaoFeedServicos');
+
+      if (tipoPerfil === 'cliente') {
+        // Exibe opções exclusivas para CLIENTE
+        if (btnNovoServico) btnNovoServico.classList.remove('hidden');
+        if (secaoFeedServicos) secaoFeedServicos.classList.remove('hidden');
+
+        // Carrega o Feed de Serviços Ofertados pelos Trabalhadores
+        carregarFeedServicos(token);
+        
+      } else if (tipoPerfil === 'trabalhador') {
+        // Exibe opções exclusivas para TRABALHADOR
+        if (menuServicosDisponiveis) menuServicosDisponiveis.classList.remove('hidden');
+        if (btnCadastrarNovoServico) btnCadastrarNovoServico.classList.remove('hidden');
+      }
     });
+
+    // Função para carregar os serviços oferecidos via API
+    async function carregarFeedServicos(token) {
+      const containerFeed = document.getElementById('containerFeedServicos');
+
+      try {
+        const response = await fetch('/servicos-oferecidos', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Falha ao buscar serviços');
+
+        const servicos = await response.json();
+
+        if (servicos.length === 0) {
+          containerFeed.innerHTML = `
+            <div class="col-span-full bg-slate-800 border border-slate-700 p-6 rounded-xl text-center text-slate-400 italic">
+              Nenhum serviço disponível no momento.
+            </div>
+          `;
+          return;
+        }
+
+        // Renderiza os cards no Feed
+        containerFeed.innerHTML = servicos.map(s => `
+          <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg flex flex-col justify-between hover:border-yellow-500/50 transition-all">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-3">
+                <span class="text-xs bg-yellow-500/10 text-yellow-500 font-semibold px-2.5 py-1 rounded border border-yellow-500/30">
+                  Profissional: ${s.nome_trabalhador}
+                </span>
+                <span class="text-sm font-bold text-emerald-400">
+                  R$ ${parseFloat(s.preco).toFixed(2)}
+                </span>
+              </div>
+              <h4 class="text-lg font-bold text-slate-100 mb-2">${s.titulo}</h4>
+              <p class="text-slate-400 text-sm line-clamp-3 mb-4">${s.descricao}</p>
+            </div>
+            
+            <button onclick="solicitarServico(${s.id})" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded transition-all text-xs uppercase tracking-wider">
+              Solicitar Contratação
+            </button>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error(error);
+        containerFeed.innerHTML = `
+          <div class="col-span-full text-red-400 text-sm">
+            Erro ao carregar lista de serviços disponíveis.
+          </div>
+        `;
+      }
+    }
+
+    function solicitarServico(idServico) {
+      alert(`Em breve: Função para contratar diretamente o serviço #${idServico}!`);
+    }
 
     // Lógica de Logout (Sair)
     document.getElementById('btnLogout').addEventListener('click', () => {
       if (confirm('Deseja realmente sair do sistema?')) {
-        localStorage.clear(); // Apaga o token e dados salvos
-        window.location.href = 'index.html'; // Redireciona para o login
+        localStorage.clear();
+        window.location.href = 'index.html';
       }
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const token = localStorage.getItem('token');
-        const tipoPerfil = localStorage.getItem('tipoPerfil'); // 'cliente' ou 'trabalhador'
-
-        // Proteção de Rota
-        if (!token) {
-            window.location.href = 'index.html';
-            return;
-        }
-
-        // Atualiza a badge no topo/sidebar
-        const badge = document.getElementById('badgeTipoPerfil');
-        if (badge) {
-            badge.textContent = tipoPerfil === 'cliente' ? 'Perfil: Cliente' : 'Perfil: Trabalhador';
-        }
-
-        // Busca o nome do cache do navegador
-        const nomeUsuario = localStorage.getItem('nomeUsuario'); 
-        
-        const displayNome = document.getElementById('nomeUsuarioDisplay');
-        
-        // Se encontrou a tag <p> e o nome salvo, ele escreve na tela
-        if (displayNome && nomeUsuario) {
-            displayNome.textContent = `Usuário: ${nomeUsuario}`;
-        }
-
-        // ==========================================
-        // CONTROLE DE PERMISSÕES NA INTERFACE
-        // ==========================================
-        const btnNovoServico = document.getElementById('btnNovoServico');
-        const menuServicosDisponiveis = document.getElementById('menuServicosDisponiveis');
-
-        if (tipoPerfil === 'cliente') {
-            // Coisas que SÓ O CLIENTE pode fazer:
-            if (btnNovoServico) btnNovoServico.classList.remove('hidden'); // Exibe o botão de pedir serviço
-            
-        } else if (tipoPerfil === 'trabalhador') {
-            // Coisas que SÓ O TRABALHADOR pode fazer:
-            if (menuServicosDisponiveis) menuServicosDisponiveis.classList.remove('hidden'); // Exibe menu de novos trabalhos
-        }
-        });
   </script>
 </body>
 </html>
