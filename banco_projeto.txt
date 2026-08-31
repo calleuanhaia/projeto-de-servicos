@@ -7,6 +7,10 @@ select * from servicos;
 select * from servicos_oferecidos;
 select * from avaliacoes_servicos;
 
+ALTER TABLE servicos 
+ADD COLUMN id_servico_oferecido INT NULL,
+ADD FOREIGN KEY (id_servico_oferecido) REFERENCES servicos_oferecidos(id) ON DELETE SET NULL;
+
 CREATE TABLE IF NOT EXISTS notificacoes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT NOT NULL,
