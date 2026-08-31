@@ -7,12 +7,13 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans min-h-screen flex flex-col md:flex-row">
+<!-- BODY: Fixo na altura da tela (h-screen) e sem barra de rolagem geral (overflow-hidden) -->
+<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col md:flex-row overflow-hidden">
 
   <!-- ========================================== -->
-  <!-- 1. MENU LATERAL (SIDEBAR)                  -->
+  <!-- 1. MENU LATERAL (SIDEBAR FIXA)             -->
   <!-- ========================================== -->
-  <aside class="w-full md:w-64 bg-slate-800 border-r border-slate-700/60 flex flex-col justify-between p-4 relative">
+  <aside class="w-full md:w-64 flex-shrink-0 h-full bg-slate-800 border-r border-slate-700/60 flex flex-col justify-between p-4 relative z-30">
     
     <!-- Detalhe superior em gradiente dourado -->
     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
@@ -37,25 +38,21 @@
           Início / Painel
         </a>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
+        <a href="meus-servicos.html" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           Meus Serviços
         </a>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Novo Pedido
-        </a>
-
         <!-- Botão visível APENAS para CLIENTES -->
         <a id="btnNovoServico" href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
-        + Solicitar Novo Serviço
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          + Solicitar Novo Serviço
         </a>
 
-        <!-- Link no Menu visível APENAS para TRABALHADORES -->
+        <!-- Links visíveis APENAS para TRABALHADORES -->
         <a id="menuServicosDisponiveis" href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        Serviços Disponíveis para Pegar
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Serviços Disponíveis
         </a>
 
         <a id="btnCadastrarNovoServico" href="cadastrar-servico.html" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 rounded-lg font-medium transition-all hidden">
@@ -80,102 +77,118 @@
   </aside>
 
   <!-- ========================================== -->
-  <!-- 2. ÁREA PRINCIPAL (MAIN CONTENT)           -->
+  <!-- 2. ÁREA PRINCIPAL CONTAINER (FIXA)         -->
   <!-- ========================================== -->
-  <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+  <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
 
-    <!-- HEADER SUPERIOR -->
-    <header class="bg-slate-800 border-b border-slate-700/60 p-4 px-6 flex items-center justify-between">
+    <!-- HEADER SUPERIOR (FIXO) -->
+    <header class="flex-shrink-0 bg-slate-800 border-b border-slate-700/60 p-4 px-6 flex items-center justify-between relative z-20">
       <div>
         <h2 class="text-xl font-bold text-slate-100">Visão Geral</h2>
         <p class="text-xs text-slate-400">Bem-vindo(a) ao seu painel de controle</p>
       </div>
 
-      <!-- INDICADOR DE STATUS -->
-      <div class="flex items-center gap-3">
+      <!-- STATUS & NOTIFICAÇÕES -->
+      <div class="flex items-center gap-4">
+        
+        <!-- PAINEL / BOTÃO DE NOTIFICAÇÕES -->
+        <div class="relative">
+          <button id="btnNotificacoes" onclick="toggleDropdownNotificacoes()" class="relative p-2 bg-slate-900 border border-slate-700 hover:border-yellow-500/50 rounded-full text-slate-300 hover:text-yellow-500 transition-all focus:outline-none">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9"/>
+            </svg>
+            <span id="badgeNotificacoes" class="absolute -top-1 -right-1 bg-yellow-500 text-slate-900 text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+          </button>
+
+          <!-- DROPDOWN DE NOTIFICAÇÕES -->
+          <div id="dropdownNotificacoes" class="hidden absolute right-0 mt-3 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50">
+            <div class="p-3 bg-slate-900 border-b border-slate-700/80 flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-yellow-500">Notificações</span>
+              <span id="txtQtdNotificacoes" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">0 novas</span>
+            </div>
+
+            <div id="containerListaNotificacoes" class="max-h-64 overflow-y-auto divide-y divide-slate-700/50">
+              <div class="p-6 text-center text-slate-500 italic text-xs">
+                Nenhuma notificação no momento.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INDICADOR DE STATUS ONLINE -->
         <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-full text-xs">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-slate-300 font-medium">Status: ONLINE</span>
+          <span class="text-slate-300 font-medium hidden sm:inline">Status: ONLINE</span>
         </div>
       </div>
     </header>
 
-    <!-- CONTEÚDO DA PÁGINA -->
-    <div class="p-6 space-y-6 overflow-y-auto">
+    <!-- CONTEÚDO DA PÁGINA (ÚNICO ELEMENTO COM ROLAGEM INTERNA) -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
 
-      <!-- CARDS DE ESTATÍSTICAS / RESUMO -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- CARDS DE ESTATÍSTICAS / RESUMO (OCULTO PARA TRABALHADORES) -->
+      <div id="secaoCardsStatus" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         
-        <!-- Card 1 -->
         <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
           <div class="absolute top-0 right-0 w-2 h-full bg-yellow-500"></div>
-          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Aguardando Aprovação</p>
-          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Serviços pendentes de resposta</p>
+          <p id="lblCard1" class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Aguardando Aprovação</p>
+          <h3 id="qtdCard1" class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p id="descCard1" class="text-xs text-slate-500 mt-1">Serviços pendentes de resposta</p>
         </div>
 
-        <!-- Card 2 -->
         <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
           <div class="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
-          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Em Andamento</p>
-          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Serviços sendo executados</p>
+          <p id="lblCard2" class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Em Andamento</p>
+          <h3 id="qtdCard2" class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p id="descCard2" class="text-xs text-slate-500 mt-1">Serviços sendo executados</p>
         </div>
 
-        <!-- Card 3 -->
         <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg relative overflow-hidden">
           <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
-          <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Concluídos</p>
-          <h3 class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
-          <p class="text-xs text-slate-500 mt-1">Histórico de trabalhos finalizados</p>
+          <p id="lblCard3" class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Concluídos</p>
+          <h3 id="qtdCard3" class="text-3xl font-extrabold text-slate-100 mt-2">0</h3>
+          <p id="descCard3" class="text-xs text-slate-500 mt-1">Histórico de trabalhos finalizados</p>
         </div>
 
       </div>
 
-      <!-- ========================================== -->
-      <!-- FEED DE SERVIÇOS OFERECIDOS (VISÍVEL PARA CLIENTES) -->
-      <!-- ========================================== -->
+      <!-- FEED DE SERVIÇOS OFERECIDOS (EXCLUSIVO CLIENTES) -->
       <div id="secaoFeedServicos" class="hidden space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <div>
             <h3 class="text-xl font-bold text-yellow-500">Catálogo de Serviços Disponíveis</h3>
-            <p class="text-xs text-slate-400">Explore e contrate serviços publicados por profissionais cadastrados</p>
+            <p class="text-xs text-slate-400">Explore os serviços publicados por profissionais cadastrados</p>
           </div>
         </div>
 
-        <!-- Grid Container do Feed -->
         <div id="containerFeedServicos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <p class="text-slate-400 italic text-sm col-span-full">Carregando serviços disponíveis...</p>
         </div>
       </div>
 
-      <!-- TABELA / LISTA DE SERVIÇOS (EXEMPLO DE BASE) -->
+      <!-- TABELA DE ATIVIDADES / SERVIÇOS OFERECIDOS -->
       <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-6 shadow-lg">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold text-yellow-500">Últimos Serviços Pedidos</h3>
-          <button class="bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold px-3 py-2 rounded transition-all">
-            + Solicitar Serviço
-          </button>
+          <h3 id="tituloTabelaRecentes" class="text-lg font-bold text-yellow-500">Últimas Atividades Recentes</h3>
+          <span class="text-xs text-slate-400" id="subtituloTabelaRecentes">Atualizado recentemente</span>
         </div>
 
-        <!-- Tabela Responsiva -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm text-slate-300">
             <thead class="text-xs uppercase bg-slate-900/80 text-yellow-600 border-b border-slate-700">
-              <tr>
+              <tr id="headersTabela">
                 <th class="px-4 py-3">ID</th>
-                <th class="px-4 py-3">Descrição</th>
+                <th class="px-4 py-3">Serviço / Item</th>
+                <th class="px-4 py-3">Cliente / Profissional</th>
                 <th class="px-4 py-3">Valor</th>
-                <th class="px-4 py-3">Data Pedido</th>
                 <th class="px-4 py-3">Status</th>
                 <th class="px-4 py-3 text-right">Ação</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-700/50">
-              <!-- Linha de exemplo em branco / sem dados -->
+            <tbody id="bodyTabelaRecentes" class="divide-y divide-slate-700/50">
               <tr>
                 <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
-                  Nenhum serviço registrado até o momento.
+                  Nenhuma atividade registrada até o momento.
                 </td>
               </tr>
             </tbody>
@@ -186,68 +199,256 @@
     </div>
   </main>
 
-  <!-- ========================================== -->
-  <!-- 3. LÓGICA JAVASCRIPT DE AUTENTICAÇÃO      -->
-  <!-- ========================================== -->
+  <!-- MODAL DE DETALHES DO SERVIÇO -->
+  <div id="modalDetalhes" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden">
+      
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
+
+      <div class="p-6 border-b border-slate-700 flex justify-between items-start">
+        <div>
+          <span id="modalTrabalhador" class="text-xs bg-yellow-500/10 text-yellow-500 font-semibold px-2.5 py-1 rounded border border-yellow-500/30 uppercase tracking-wider">
+            Profissional
+          </span>
+          <h3 id="modalTitulo" class="text-2xl font-bold text-slate-100 mt-2">Título do Serviço</h3>
+          <p id="modalPreco" class="text-xl font-extrabold text-emerald-400 mt-1">R$ 0,00</p>
+        </div>
+        <button onclick="fecharModalDetalhes()" class="text-slate-400 hover:text-slate-100 p-1 rounded-lg hover:bg-slate-700/50 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-300">
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wider text-yellow-500 mb-2">Descrição Completa</h4>
+          <p id="modalDescricao" class="text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-4 rounded-lg border border-slate-700/50">
+            Carregando descrição...
+          </p>
+        </div>
+
+        <div class="border-t border-slate-700/60 pt-6">
+          <h4 class="text-sm font-bold uppercase tracking-wider text-yellow-500 mb-4">Avaliações & Comentários</h4>
+
+          <form id="formNovaAvaliacao" class="bg-slate-900/60 p-4 rounded-lg border border-slate-700/60 mb-6 space-y-3">
+            <label class="block text-xs font-semibold text-slate-300 uppercase">Deixe sua Avaliação</label>
+            
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">Sua nota:</span>
+              <select id="selectNotaAvaliacao" class="bg-slate-800 border border-slate-700 text-yellow-400 text-sm font-bold rounded px-2 py-1 focus:outline-none focus:border-yellow-500">
+                <option value="5">★★★★★ (5)</option>
+                <option value="4">★★★★☆ (4)</option>
+                <option value="3">★★★☆☆ (3)</option>
+                <option value="2">★★☆☆☆ (2)</option>
+                <option value="1">★☆☆☆☆ (1)</option>
+              </select>
+            </div>
+
+            <textarea id="txtComentarioAvaliacao" rows="2" placeholder="Escreva seu comentário..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-xs text-slate-100 focus:outline-none focus:border-yellow-500 transition-colors" required></textarea>
+
+            <button type="submit" class="bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-1.5 px-4 rounded text-xs uppercase tracking-wider transition-colors">
+              Enviar Avaliação
+            </button>
+          </form>
+
+          <div id="msgJaAvaliou" class="hidden bg-slate-900/60 p-3.5 rounded-lg border border-yellow-500/30 text-yellow-500 text-xs font-semibold mb-6 flex items-center gap-2">
+            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Você já avaliou este serviço.
+          </div>
+
+          <div id="listaComentarios" class="space-y-3">
+            <p class="text-xs text-slate-500 italic">Nenhum comentário registrado ainda.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-700 bg-slate-800/80 flex items-center justify-between gap-3">
+        <button onclick="fecharModalDetalhes()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold uppercase tracking-wider rounded transition-colors">
+          Fechar
+        </button>
+        <button id="btnSolicitarContratacaoModal" class="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold uppercase tracking-wider rounded transition-colors">
+          Solicitar Contratação
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
-    // Executa ao carregar a página
+    let servicoSelecionadoId = null;
+    let servicoAtualModal = null;
+
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
       const tipoPerfil = localStorage.getItem('tipoPerfil');
       const nomeUsuario = localStorage.getItem('nomeUsuario');
 
-      // Proteção de Rota: Se não tem token, manda de volta pro Login
       if (!token) {
         alert('Você precisa estar logado para acessar esta página!');
         window.location.href = 'index.html';
         return;
       }
 
-      // Atualiza o Badge do Perfil na Sidebar
       const badge = document.getElementById('badgeTipoPerfil');
       if (badge && tipoPerfil) {
         badge.textContent = tipoPerfil === 'cliente' ? 'Perfil: Cliente' : 'Perfil: Trabalhador';
       }
 
-      // Exibe o Nome do Usuário
       const displayNome = document.getElementById('nomeUsuarioDisplay');
       if (displayNome && nomeUsuario) {
         displayNome.textContent = `Usuário: ${nomeUsuario}`;
       }
 
-      // ==========================================
-      // CONTROLE DE PERMISSÕES NA INTERFACE
-      // ==========================================
       const btnNovoServico = document.getElementById('btnNovoServico');
       const menuServicosDisponiveis = document.getElementById('menuServicosDisponiveis');
       const btnCadastrarNovoServico = document.getElementById('btnCadastrarNovoServico');
       const secaoFeedServicos = document.getElementById('secaoFeedServicos');
+      const secaoCardsStatus = document.getElementById('secaoCardsStatus');
+      const tituloTabela = document.getElementById('tituloTabelaRecentes');
+      const headersTabela = document.getElementById('headersTabela');
 
       if (tipoPerfil === 'cliente') {
-        // Exibe opções exclusivas para CLIENTE
         if (btnNovoServico) btnNovoServico.classList.remove('hidden');
         if (secaoFeedServicos) secaoFeedServicos.classList.remove('hidden');
+        if (tituloTabela) tituloTabela.textContent = 'Meus Pedidos Recentes';
 
-        // Carrega o Feed de Serviços Ofertados pelos Trabalhadores
         carregarFeedServicos(token);
+        carregarRecentesCliente(token);
         
       } else if (tipoPerfil === 'trabalhador') {
-        // Exibe opções exclusivas para TRABALHADOR
         if (menuServicosDisponiveis) menuServicosDisponiveis.classList.remove('hidden');
         if (btnCadastrarNovoServico) btnCadastrarNovoServico.classList.remove('hidden');
+        
+        // Oculta cards de status
+        if (secaoCardsStatus) secaoCardsStatus.classList.add('hidden');
+        
+        if (tituloTabela) tituloTabela.textContent = 'Meus Serviços Oferecidos';
+        
+        // Ajusta cabeçalho da tabela removendo colunas de cliente e status
+        if (headersTabela) {
+          headersTabela.innerHTML = `
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Serviço Oferecido</th>
+            <th class="px-4 py-3">Valor</th>
+            <th class="px-4 py-3 text-right">Ação</th>
+          `;
+        }
+
+        carregarRecentesTrabalhador(token);
+      }
+
+      carregarNotificacoes(token);
+    });
+
+    function toggleDropdownNotificacoes() {
+      const dropdown = document.getElementById('dropdownNotificacoes');
+      dropdown.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = document.getElementById('btnNotificacoes');
+      const dropdown = document.getElementById('dropdownNotificacoes');
+      if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
       }
     });
 
-    // Função para carregar os serviços oferecidos via API
+    async function carregarNotificacoes(token) {
+      const container = document.getElementById('containerListaNotificacoes');
+      const badge = document.getElementById('badgeNotificacoes');
+      const txtQtd = document.getElementById('txtQtdNotificacoes');
+
+      try {
+        const response = await fetch('/notificacoes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const notificacoes = await response.json();
+
+          if (notificacoes.length > 0) {
+            badge.textContent = notificacoes.length;
+            badge.classList.remove('hidden');
+            txtQtd.textContent = `${notificacoes.length} nova(s)`;
+
+            container.innerHTML = notificacoes.map(n => `
+              <div class="p-3 hover:bg-slate-700/30 transition-colors">
+                <p class="text-xs font-semibold text-slate-200">${n.titulo}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">${n.mensagem}</p>
+                <span class="text-[9px] text-slate-500 mt-1 block">${n.data_formatada || ''}</span>
+              </div>
+            `).join('');
+            return;
+          }
+        }
+      } catch (err) {}
+
+      badge.classList.add('hidden');
+      txtQtd.textContent = '0 novas';
+      container.innerHTML = `
+        <div class="p-6 text-center text-slate-500 italic text-xs">
+          Nenhuma notificação no momento.
+        </div>
+      `;
+    }
+
+    async function carregarRecentesTrabalhador(token) {
+      const tbody = document.getElementById('bodyTabelaRecentes');
+
+      try {
+        const response = await fetch('/trabalhador/recentes', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const itens = await response.json();
+          if (itens.length > 0) {
+            tbody.innerHTML = itens.map(item => `
+              <tr class="hover:bg-slate-700/30 transition-colors">
+                <td class="px-4 py-3 font-mono text-xs text-yellow-500">#${item.id}</td>
+                <td class="px-4 py-3 font-semibold text-slate-200">${item.titulo}</td>
+                <td class="px-4 py-3 font-bold text-emerald-400">R$ ${parseFloat(item.preco).toFixed(2)}</td>
+                <td class="px-4 py-3 text-right">
+                  <button onclick="abrirDetalhesServico(${item.id})" class="text-xs bg-slate-700 hover:bg-yellow-600 hover:text-slate-900 text-slate-200 font-bold px-2.5 py-1 rounded transition-colors">
+                    Ver
+                  </button>
+                </td>
+              </tr>
+            `).join('');
+            return;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="px-4 py-8 text-center text-slate-500 italic">
+            Nenhum serviço oferecido encontrado.
+          </td>
+        </tr>
+      `;
+    }
+
+    function carregarRecentesCliente(token) {}
+
+    function gerarEstrelasHTML(nota) {
+      const notaNum = Math.round(nota || 5);
+      let estrelas = '';
+      for (let i = 1; i <= 5; i++) {
+        estrelas += i <= notaNum ? '<span class="text-yellow-400">★</span>' : '<span class="text-slate-600">★</span>';
+      }
+      return estrelas;
+    }
+
     async function carregarFeedServicos(token) {
       const containerFeed = document.getElementById('containerFeedServicos');
 
       try {
         const response = await fetch('/servicos-oferecidos', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) throw new Error('Falha ao buscar serviços');
@@ -263,43 +464,189 @@
           return;
         }
 
-        // Renderiza os cards no Feed
-        containerFeed.innerHTML = servicos.map(s => `
-          <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg flex flex-col justify-between hover:border-yellow-500/50 transition-all">
-            <div>
-              <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-3">
-                <span class="text-xs bg-yellow-500/10 text-yellow-500 font-semibold px-2.5 py-1 rounded border border-yellow-500/30">
-                  Profissional: ${s.nome_trabalhador}
-                </span>
-                <span class="text-sm font-bold text-emerald-400">
-                  R$ ${parseFloat(s.preco).toFixed(2)}
-                </span>
+        containerFeed.innerHTML = servicos.map(s => {
+          const mediaNota = s.media_nota ? parseFloat(s.media_nota) : 5;
+          return `
+            <div class="bg-slate-800 border border-slate-700/80 rounded-xl p-5 shadow-lg flex flex-col justify-between hover:border-yellow-500/50 transition-all">
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 mb-3">
+                  <span class="text-xs bg-yellow-500/10 text-yellow-500 font-semibold px-2.5 py-1 rounded border border-yellow-500/30">
+                    Profissional: ${s.nome_trabalhador}
+                  </span>
+                  <span class="text-sm font-bold text-emerald-400">
+                    R$ ${parseFloat(s.preco).toFixed(2)}
+                  </span>
+                </div>
+                
+                <h4 class="text-lg font-bold text-slate-100 mb-2">${s.titulo}</h4>
+
+                <div class="flex items-center gap-1 my-3 text-sm">
+                  ${gerarEstrelasHTML(mediaNota)}
+                  <span class="text-xs text-slate-400 ml-1 font-medium">(${mediaNota.toFixed(1)})</span>
+                </div>
               </div>
-              <h4 class="text-lg font-bold text-slate-100 mb-2">${s.titulo}</h4>
-              <p class="text-slate-400 text-sm line-clamp-3 mb-4">${s.descricao}</p>
+
+              <button onclick="abrirDetalhesServico(${s.id})" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded transition-all text-xs uppercase tracking-wider mt-2">
+                Mais Detalhes
+              </button>
             </div>
-            
-            <button onclick="solicitarServico(${s.id})" class="w-full bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-bold py-2 px-4 rounded transition-all text-xs uppercase tracking-wider">
-              Solicitar Contratação
-            </button>
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
       } catch (error) {
         console.error(error);
-        containerFeed.innerHTML = `
-          <div class="col-span-full text-red-400 text-sm">
-            Erro ao carregar lista de serviços disponíveis.
-          </div>
-        `;
+        containerFeed.innerHTML = `<div class="col-span-full text-red-400 text-sm">Erro ao carregar lista de serviços.</div>`;
       }
     }
 
-    function solicitarServico(idServico) {
-      alert(`Em breve: Função para contratar diretamente o serviço #${idServico}!`);
+    async function abrirDetalhesServico(idServico) {
+      const token = localStorage.getItem('token');
+      servicoSelecionadoId = idServico;
+
+      try {
+        const response = await fetch(`/servicos-oferecidos/${idServico}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Erro ao buscar detalhes');
+
+        const dados = await response.json();
+        servicoAtualModal = dados; // Salva o objeto completo na variável global
+
+        document.getElementById('modalTrabalhador').textContent = `Profissional: ${dados.nome_trabalhador}`;
+        document.getElementById('modalTitulo').textContent = dados.titulo;
+        document.getElementById('modalPreco').textContent = `R$ ${parseFloat(dados.preco).toFixed(2)}`;
+        document.getElementById('modalDescricao').textContent = dados.descricao;
+
+        // Atribui a chamada da contratação ao botão do modal
+        document.getElementById('btnSolicitarContratacaoModal').onclick = () => solicitarServico();
+
+        const formAvaliacao = document.getElementById('formNovaAvaliacao');
+        const msgJaAvaliou = document.getElementById('msgJaAvaliou');
+
+        if (dados.jaAvaliou) {
+          if (formAvaliacao) formAvaliacao.classList.add('hidden');
+          if (msgJaAvaliou) msgJaAvaliou.classList.remove('hidden');
+        } else {
+          if (formAvaliacao) formAvaliacao.classList.remove('hidden');
+          if (msgJaAvaliou) msgJaAvaliou.classList.add('hidden');
+        }
+
+        renderizarComentarios(dados.comentarios || []);
+        document.getElementById('modalDetalhes').classList.remove('hidden');
+
+      } catch (err) {
+        alert('Erro ao carregar detalhes do serviço.');
+        console.error(err);
+      }
     }
 
-    // Lógica de Logout (Sair)
+    function fecharModalDetalhes() {
+      document.getElementById('modalDetalhes').classList.add('hidden');
+      servicoSelecionadoId = null;
+      servicoAtualModal = null;
+    }
+
+    function renderizarComentarios(comentarios) {
+      const container = document.getElementById('listaComentarios');
+      if (!comentarios || comentarios.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">Nenhum comentário registrado ainda.</p>`;
+        return;
+      }
+
+      container.innerHTML = comentarios.map(c => `
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/50 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-yellow-500">${c.nome_cliente || 'Cliente'}</span>
+            <div class="text-xs flex items-center gap-1">
+              ${gerarEstrelasHTML(c.nota)}
+            </div>
+          </div>
+          <p class="text-xs text-slate-300">${c.comentario}</p>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('formNovaAvaliacao').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      if (!servicoSelecionadoId) return;
+
+      const nota = parseInt(document.getElementById('selectNotaAvaliacao').value);
+      const comentario = document.getElementById('txtComentarioAvaliacao').value;
+
+      try {
+        const response = await fetch(`/servicos-oferecidos/${servicoSelecionadoId}/avaliar`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ nota, comentario })
+        });
+
+        if (response.ok) {
+          document.getElementById('txtComentarioAvaliacao').value = '';
+          abrirDetalhesServico(servicoSelecionadoId);
+          carregarFeedServicos(token);
+        } else {
+          const errData = await response.json();
+          alert(errData.erro || 'Erro ao publicar avaliação.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro de conexão ao enviar avaliação.');
+      }
+    });
+
+    async function solicitarServico() {
+      if (!servicoAtualModal) return;
+
+      const token = localStorage.getItem('token');
+      const confirma = confirm(`Confirma a contratação do serviço "${servicoAtualModal.titulo}" no valor de R$ ${parseFloat(servicoAtualModal.preco).toFixed(2)}?`);
+      
+      if (!confirma) return;
+
+      const trabalhadorIdRaw = servicoAtualModal.trabalhador_id || servicoAtualModal.usuario_id || servicoAtualModal.id_trabalhador;
+
+      // Mesma estrutura de payload utilizada no gerenciador de serviços
+      const payload = {
+        servico_oferecido_id: Number(servicoAtualModal.id),
+        id_servico_oferecido: Number(servicoAtualModal.id),
+        id_trabalhador: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
+        trabalhador_id: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
+        titulo: servicoAtualModal.titulo,
+        descricao: servicoAtualModal.descricao,
+        valor: parseFloat(servicoAtualModal.preco),
+        preco: parseFloat(servicoAtualModal.preco),
+        status: 'pendente'
+      };
+
+      try {
+        const response = await fetch('/servicos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const resultado = await response.json();
+
+        if (response.ok) {
+          alert('Contratação solicitada com sucesso! Você pode acompanhar o andamento em "Meus Serviços".');
+          fecharModalDetalhes();
+          window.location.href = 'meus-servicos.html';
+        } else {
+          alert(resultado.erro || resultado.message || 'Erro ao realizar a solicitação de contratação.');
+        }
+      } catch (err) {
+        console.error('Erro na requisição de contratação:', err);
+        alert('Erro de conexão com o servidor.');
+      }
+    }
+
     document.getElementById('btnLogout').addEventListener('click', () => {
       if (confirm('Deseja realmente sair do sistema?')) {
         localStorage.clear();
