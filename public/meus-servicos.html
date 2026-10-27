@@ -205,6 +205,19 @@
             <textarea id="contratoDescricao" rows="3" readonly required class="w-full bg-slate-950/60 border border-slate-700/80 rounded-lg p-2.5 text-sm text-slate-300 focus:outline-none resize-none cursor-not-allowed"></textarea>
           </div>
 
+          <!-- NOVO CAMPO: ESPECIFICAÇÕES ADICIONAIS -->
+<div>
+  <label for="contratoEspecificacoes" class="block text-xs font-semibold text-slate-300 uppercase mb-1">
+    Especificações ou Observações Adicionais
+  </label>
+  <textarea 
+    id="contratoEspecificacoes" 
+    rows="3" 
+    placeholder="Ex: Detalhes do local, preferência de horário, urgência, etc..." 
+    class="w-full bg-slate-900 border border-slate-700/80 rounded-lg p-2.5 text-sm text-slate-100 focus:outline-none focus:border-yellow-500 resize-none transition-colors"
+  ></textarea>
+</div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label for="contratoPreco" class="block text-xs font-semibold text-slate-300 uppercase mb-1">Valor (R$)</label>
@@ -531,68 +544,100 @@
     }
 
     function limparCamposContrato() {
-      document.getElementById('contratoTitulo').value = '';
-      document.getElementById('contratoDescricao').value = '';
-      document.getElementById('contratoPreco').value = '';
-      document.getElementById('contratoTrabalhadorId').value = '';
-    }
+  document.getElementById('contratoTitulo').value = '';
+  document.getElementById('contratoDescricao').value = '';
+  document.getElementById('contratoPreco').value = '';
+  document.getElementById('contratoTrabalhadorId').value = '';
+  
+  const campoEsp = document.getElementById('contratoEspecificacoes');
+  if (campoEsp) campoEsp.value = '';
+}
 
     function fecharModalContratar() {
       document.getElementById('modalContratarServico').classList.add('hidden');
       document.getElementById('formContratarServico').reset();
     }
 
-    async function confirmarContratacao(e) {
-      e.preventDefault();
-      const token = localStorage.getItem('token');
-      const servicoOferecidoId = document.getElementById('selectServicoOferecido').value;
+    /* ========================================== */
+/* SALVA CONTRATAÇÃO E REDIRECIONA WHATSAPP    */
+/* ========================================== */
+async function confirmarContratacao(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const servicoOferecidoId = document.getElementById('selectServicoOferecido').value;
 
-      if (!servicoOferecidoId) {
-        alert('Por favor, selecione um serviço oferecido antes de prosseguir.');
-        return;
-      }
+  if (!servicoOferecidoId) {
+    alert('Por favor, selecione um serviço oferecido antes de prosseguir.');
+    return;
+  }
 
-      const trabalhadorIdRaw = document.getElementById('contratoTrabalhadorId').value;
-      const precoRaw = document.getElementById('contratoPreco').value;
+  // Busca o serviço selecionado no array global carregado
+  const servico = listaServicosOferecidosGlobal.find(item => item.id == servicoOferecidoId);
+  if (!servico) {
+    alert('Erro: Serviço não encontrado no catálogo.');
+    return;
+  }
 
-      const payload = {
-        servico_oferecido_id: Number(servicoOferecidoId),
-        id_servico_oferecido: Number(servicoOferecidoId),
-        id_trabalhador: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
-        trabalhador_id: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
-        titulo: document.getElementById('contratoTitulo').value,
-        descricao: document.getElementById('contratoDescricao').value,
-        valor: parseFloat(precoRaw),
-        preco: parseFloat(precoRaw),
-        status: 'pendente'
-      };
+  const especificacoes = document.getElementById('contratoEspecificacoes')?.value.trim() || '';
+  const trabalhadorId = servico.id_trabalhador || servico.trabalhador_id;
+  const valorNum = parseFloat(servico.preco || servico.valor);
 
-      try {
-        const response = await fetch('/servicos', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
+  const payload = {
+    id_trabalhador: Number(trabalhadorId),
+    titulo: servico.titulo,
+    descricao: servico.descricao || '',
+    valor: valorNum,
+    especificacoes: especificacoes
+  };
 
-        const resultado = await response.json();
+  try {
+    const response = await fetch('/servicos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
 
-        if (response.ok) {
-          alert('Contratação realizada com sucesso!');
-          fecharModalContratar();
-          const tipoPerfil = localStorage.getItem('tipoPerfil');
-          const endpoint = tipoPerfil === 'cliente' ? '/meus-pedidos' : '/meus-servicos-contratados';
-          carregarServicosTabela(token, endpoint);
-        } else {
-          alert(resultado.erro || resultado.message || 'Erro ao realizar contratação.');
-        }
-      } catch (err) {
-        console.error('Erro na requisição de contratação:', err);
-        alert('Erro de conexão com o servidor ao salvar o serviço.');
-      }
+    const resultado = await response.json();
+
+    if (!response.ok) {
+      alert(resultado.erro || resultado.message || 'Erro ao realizar a contratação.');
+      return;
     }
+
+    // 1. Atualiza a tabela com o novo pedido registrado
+    fecharModalContratar();
+    const tipoPerfil = localStorage.getItem('tipoPerfil');
+    const endpoint = tipoPerfil === 'cliente' ? '/meus-pedidos' : '/meus-servicos-contratados';
+    carregarServicosTabela(token, endpoint);
+
+    // 2. Prepara e abre a mensagem no WhatsApp
+    const telefoneTrabalhador = formatarTelefoneWhatsApp(servico.telefone_trabalhador);
+
+    let mensagemWhatsApp = `Olá, *${servico.nome_trabalhador || 'Profissional'}*!\n\n`;
+    mensagemWhatsApp += `Acabei de solicitar a contratação do seu serviço: *${servico.titulo}*\n`;
+    mensagemWhatsApp += `💰 *Valor:* R$ ${valorNum.toFixed(2)}\n`;
+
+    if (especificacoes) {
+      mensagemWhatsApp += `\n📝 *Especificações / Observações:*\n${especificacoes}\n`;
+    }
+
+    mensagemWhatsApp += `\nAguardo seu retorno para combinarmos os detalhes e a forma de pagamento!`;
+
+    if (telefoneTrabalhador) {
+      const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefoneTrabalhador}&text=${encodeURIComponent(mensagemWhatsApp)}`;
+      window.open(urlWhatsApp, '_blank');
+    } else {
+      alert('Solicitação gravada com sucesso no sistema! (O profissional não possui telefone cadastrado).');
+    }
+
+  } catch (err) {
+    console.error('Erro na requisição de contratação:', err);
+    alert('Erro de conexão ao salvar na base de dados.');
+  }
+}
 
     function abrirModalGerenciar(id, titulo, statusAtual) {
   document.getElementById('gerenciarServicoId').value = id;
@@ -684,6 +729,18 @@
         window.location.href = 'index.html';
       }
     });
+
+    /* ========================================== */
+/* AUXILIAR: FORMATAR NÚMERO DE WHATSAPP      */
+/* ========================================== */
+function formatarTelefoneWhatsApp(telefone) {
+  if (!telefone) return '';
+  let limpo = telefone.replace(/\D/g, '');
+  if (limpo.length === 10 || limpo.length === 11) {
+    limpo = '55' + limpo;
+  }
+  return limpo;
+}
   </script>
 </body>
 </html>

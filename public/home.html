@@ -266,6 +266,18 @@
         <button onclick="fecharModalDetalhes()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold uppercase tracking-wider rounded transition-colors">
           Fechar
         </button>
+        <!-- Campo para o cliente detalhar a solicitação -->
+        <div class="mt-4 mb-4 text-left">
+          <label for="txtEspecificacoes" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            Especificações ou detalhes adicionais do serviço:
+          </label>
+          <textarea 
+            id="txtEspecificacoes" 
+            rows="3" 
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500 transition-all"
+            placeholder="Ex: Preciso da pintura em 2 cômodos, paredes de 3x4m, prefiro atendimento no sábado pela manhã..."
+          ></textarea>
+        </div>
         <button id="btnSolicitarContratacaoModal" class="px-6 py-2 bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold uppercase tracking-wider rounded transition-colors">
           Solicitar Contratação
         </button>
@@ -499,6 +511,23 @@
       }
     }
 
+    /* ========================================== */
+    /* FUNÇÃO AUXILIAR: FORMATAR NÚMERO WHATSAPP  */
+    /* ========================================== */
+    function formatarTelefoneWhatsApp(telefone) {
+      if (!telefone) return '';
+      // Remove parênteses, traços, espaços e outros caracteres
+      let limpo = telefone.replace(/\D/g, '');
+      // Adiciona o código do país (55 - Brasil) caso não esteja presente
+      if (limpo.length === 10 || limpo.length === 11) {
+        limpo = '55' + limpo;
+      }
+      return limpo;
+    }
+
+    /* ========================================== */
+    /* ABRIR DETALHES DO SERVIÇO                  */
+    /* ========================================== */
     async function abrirDetalhesServico(idServico) {
       const token = localStorage.getItem('token');
       servicoSelecionadoId = idServico;
@@ -511,14 +540,18 @@
         if (!response.ok) throw new Error('Erro ao buscar detalhes');
 
         const dados = await response.json();
-        servicoAtualModal = dados; // Salva o objeto completo na variável global
+        servicoAtualModal = dados;
 
-        document.getElementById('modalTrabalhador').textContent = `Profissional: ${dados.nome_trabalhador}`;
+        document.getElementById('modalTrabalhador').textContent = `Profissional: ${dados.nome_trabalhador || 'Profissional'}`;
         document.getElementById('modalTitulo').textContent = dados.titulo;
         document.getElementById('modalPreco').textContent = `R$ ${parseFloat(dados.preco).toFixed(2)}`;
         document.getElementById('modalDescricao').textContent = dados.descricao;
 
-        // Atribui a chamada da contratação ao botão do modal
+        // Limpa o campo de especificações ao abrir
+        const txtEsp = document.getElementById('txtEspecificacoes');
+        if (txtEsp) txtEsp.value = '';
+
+        // Associa o clique do botão
         document.getElementById('btnSolicitarContratacaoModal').onclick = () => solicitarServico();
 
         const formAvaliacao = document.getElementById('formNovaAvaliacao');
@@ -599,27 +632,30 @@
       }
     });
 
+    /* ========================================== */
+    /* SOLICITAR CONTRATAÇÃO E ENVIAR PARA WHATSAPP */
+    /* ========================================== */
     async function solicitarServico() {
       if (!servicoAtualModal) return;
 
       const token = localStorage.getItem('token');
-      const confirma = confirm(`Confirma a contratação do serviço "${servicoAtualModal.titulo}" no valor de R$ ${parseFloat(servicoAtualModal.preco).toFixed(2)}?`);
-      
-      if (!confirma) return;
+      const especificacoes = document.getElementById('txtEspecificacoes')?.value.trim() || '';
 
-      const trabalhadorIdRaw = servicoAtualModal.trabalhador_id || servicoAtualModal.usuario_id || servicoAtualModal.id_trabalhador;
+      const trabalhadorId = servicoAtualModal.id_trabalhador || servicoAtualModal.trabalhador_id;
+      const valorNum = parseFloat(servicoAtualModal.preco || servicoAtualModal.valor);
 
-      // Mesma estrutura de payload utilizada no gerenciador de serviços
+      if (!trabalhadorId || isNaN(valorNum)) {
+        alert('Erro: Dados do serviço ou profissional incompletos.');
+        return;
+      }
+
+      // 1. Envia a solicitação para salvar no Banco de Dados
       const payload = {
-        servico_oferecido_id: Number(servicoAtualModal.id),
-        id_servico_oferecido: Number(servicoAtualModal.id),
-        id_trabalhador: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
-        trabalhador_id: trabalhadorIdRaw ? Number(trabalhadorIdRaw) : null,
+        id_trabalhador: Number(trabalhadorId),
         titulo: servicoAtualModal.titulo,
-        descricao: servicoAtualModal.descricao,
-        valor: parseFloat(servicoAtualModal.preco),
-        preco: parseFloat(servicoAtualModal.preco),
-        status: 'pendente'
+        descricao: servicoAtualModal.descricao || '',
+        valor: valorNum,
+        especificacoes: especificacoes
       };
 
       try {
@@ -634,13 +670,34 @@
 
         const resultado = await response.json();
 
-        if (response.ok) {
-          alert('Contratação solicitada com sucesso! Você pode acompanhar o andamento em "Meus Serviços".');
-          fecharModalDetalhes();
-          window.location.href = 'meus-servicos.html';
-        } else {
-          alert(resultado.erro || resultado.message || 'Erro ao realizar a solicitação de contratação.');
+        if (!response.ok) {
+          alert(resultado.erro || 'Erro ao realizar a solicitação de contratação.');
+          return;
         }
+
+        // 2. Prepara a mensagem para o WhatsApp
+        const telefoneTrabalhador = formatarTelefoneWhatsApp(servicoAtualModal.telefone_trabalhador);
+
+        let mensagemWhatsApp = `Olá, *${servicoAtualModal.nome_trabalhador || 'Profissional'}*!\n\n`;
+        mensagemWhatsApp += `Gostaria de contratar o seu serviço: *${servicoAtualModal.titulo}*\n`;
+        mensagemWhatsApp += `💰 *Valor:* R$ ${valorNum.toFixed(2)}\n`;
+
+        if (especificacoes) {
+          mensagemWhatsApp += `\n📝 *Especificações / Detalhes adicionais:*\n${especificacoes}\n`;
+        }
+
+        mensagemWhatsApp += `\nAguardo seu retorno para combinarmos a execução e a forma de pagamento!`;
+
+        fecharModalDetalhes();
+
+        // 3. Redireciona para o WhatsApp se o telefone existir
+        if (telefoneTrabalhador) {
+          const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefoneTrabalhador}&text=${encodeURIComponent(mensagemWhatsApp)}`;
+          window.open(urlWhatsApp, '_blank');
+        } else {
+          alert('Solicitação realizada no sistema! (O profissional não possui telefone cadastrado para redirecionamento direto).');
+        }
+
       } catch (err) {
         console.error('Erro na requisição de contratação:', err);
         alert('Erro de conexão com o servidor.');

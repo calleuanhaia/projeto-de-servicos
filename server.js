@@ -159,7 +159,7 @@ app.post('/servicos-oferecidos', autenticarToken, (req, res) => {
 });
 
 // ==========================================
-// ROTA 4 (ATUALIZADA): LISTAR SERVIÇOS COM MÉDIA DE NOTAS
+// ROTA 4: LISTAR SERVIÇOS COM MÉDIA DE NOTAS E TELEFONE
 // ==========================================
 app.get('/servicos-oferecidos', autenticarToken, (req, res) => {
   const sql = `
@@ -172,6 +172,7 @@ app.get('/servicos-oferecidos', autenticarToken, (req, res) => {
       so.data_criacao,
       t.usuario AS nome_trabalhador,
       t.email AS email_trabalhador,
+      t.telefone AS telefone_trabalhador,
       AVG(a.nota) AS media_nota
     FROM servicos_oferecidos so
     INNER JOIN trabalhadores t ON so.id_trabalhador = t.id
@@ -190,7 +191,7 @@ app.get('/servicos-oferecidos', autenticarToken, (req, res) => {
 });
 
 // ==========================================
-// ROTA 5: OBTER DETALHES DO SERVIÇO E COMENTÁRIOS (COM TRAVA DE AVALIAÇÃO)
+// ROTA 5: OBTER DETALHES DO SERVIÇO E COMENTÁRIOS
 // ==========================================
 app.get('/servicos-oferecidos/:id', autenticarToken, (req, res) => {
   const idServico = req.params.id;
@@ -203,7 +204,8 @@ app.get('/servicos-oferecidos/:id', autenticarToken, (req, res) => {
       so.titulo, 
       so.descricao, 
       so.preco,
-      t.usuario AS nome_trabalhador
+      t.usuario AS nome_trabalhador,
+      t.telefone AS telefone_trabalhador
     FROM servicos_oferecidos so
     INNER JOIN trabalhadores t ON so.id_trabalhador = t.id
     WHERE so.id = ?
@@ -229,7 +231,6 @@ app.get('/servicos-oferecidos/:id', autenticarToken, (req, res) => {
         return res.status(500).json({ erro: 'Erro ao buscar comentários.' });
       }
 
-      // Verifica se o usuário atual (caso seja cliente) já avaliou este serviço
       const jaAvaliou = req.usuario.tipo === 'cliente' && 
         resultsComentarios.some(c => c.id_cliente === idUsuario);
 
@@ -597,19 +598,24 @@ app.post('/servicos', autenticarToken, (req, res) => {
     return res.status(403).json({ erro: 'Apenas clientes podem contratar serviços.' });
   }
 
-  const { id_trabalhador, descricao, valor } = req.body;
+  const { id_trabalhador, descricao, valor, especificacoes } = req.body;
   const id_cliente = req.usuario.id;
 
   if (!id_trabalhador || !valor) {
     return res.status(400).json({ erro: 'ID do profissional e valor são obrigatórios.' });
   }
 
+  // Junta a descrição original com as especificações informadas pelo cliente
+  const descricaoFinal = especificacoes 
+    ? `${descricao || ''}\n\n[Especificações do Cliente]: ${especificacoes}`
+    : descricao;
+
   const sqlInsert = `
     INSERT INTO servicos (id_cliente, id_trabalhador, descricao, valor, data_pedido, status) 
     VALUES (?, ?, ?, ?, CURDATE(), 'AGUARDANDO APROVAÇÃO')
   `;
 
-  db.query(sqlInsert, [id_cliente, id_trabalhador, descricao, valor], (err, result) => {
+  db.query(sqlInsert, [id_cliente, id_trabalhador, descricaoFinal, valor], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ erro: 'Erro ao registrar contratação no banco de dados.' });
@@ -646,6 +652,85 @@ app.put('/servicos-oferecidos/:id', autenticarToken, (req, res) => {
     res.json({ mensagem: 'Anúncio atualizado com sucesso!' });
   });
 });
+
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+// 1. Inicializa o cliente do WhatsApp (salva a sessão localmente para não precisar escanear sempre)
+const client = new Client({
+  authStrategy: new LocalAuth()
+});
+
+// 2. Exibe o QR Code no terminal para você conectar seu WhatsApp
+client.on('qr', (qr) => {
+  console.log('\n--- ESCANEIE O QR CODE COM SEU WHATSAPP ---');
+  qrcode.generate(qr, { small: true });
+});
+
+client.on('ready', () => {
+  console.log('🤖 Bot do WhatsApp conectado e pronto para uso!');
+});
+
+// 3. Lógica para escutar e responder mensagens
+client.on('message', async (msg) => {
+  const mensagemRecebida = msg.body.toLowerCase().trim();
+
+  // Verifica se a mensagem contém intenção de busca
+  if (mensagemRecebida.includes('contratar') || mensagemRecebida.includes('encanador') || mensagemRecebida.includes('pintor')) {
+    
+    // Resposta imediata antes da busca
+    await msg.reply('🔎 Aguarde, procurando os profissionais mais próximos...');
+
+    // Identifica o termo digitado (ex: "encanador", "pintor")
+    let termoBusca = 'encanador'; // Padrão
+    if (mensagemRecebida.includes('pintor')) termoBusca = 'pintor';
+    if (mensagemRecebida.includes('limpeza')) termoBusca = 'limpeza';
+
+    // Consulta os serviços cadastrados na sua tabela 'servicos_oferecidos'
+    const sql = `
+      SELECT 
+        so.titulo, 
+        so.descricao, 
+        so.preco, 
+        t.usuario AS nome_trabalhador, 
+        t.telefone AS telefone_trabalhador
+      FROM servicos_oferecidos so
+      INNER JOIN trabalhadores t ON so.id_trabalhador = t.id
+      WHERE LOWER(so.titulo) LIKE ? OR LOWER(so.descricao) LIKE ?
+      LIMIT 5
+    `;
+
+    const busca = `%${termoBusca}%`;
+
+    db.query(sql, [busca, busca], (err, results) => {
+      if (err || results.length === 0) {
+        return msg.reply(` Desculpe, não encontrei nenhum profissional cadastrado para "${termoBusca}" no momento.`);
+      }
+
+      // Monta a resposta formatada para o WhatsApp
+      let resposta = `📍 *Aqui estão os profissionais disponíveis para ${termoBusca.toUpperCase()}:*\n\n`;
+
+      results.forEach((servico, index) => {
+        resposta += `*${index + 1}. ${servico.titulo}*\n`;
+        resposta += `👤 *Profissional:* ${servico.nome_trabalhador}\n`;
+        resposta += `💰 *Valor:* R$ ${parseFloat(servico.preco).toFixed(2)}\n`;
+        if (servico.telefone_trabalhador) {
+          resposta += `📞 *Contato Direto:* wa.me/55${servico.telefone_trabalhador.replace(/\D/g, '')}\n`;
+        }
+        resposta += `------------------------------\n`;
+      });
+
+      resposta += `\nCaso queira mais opções ou detalhes, acesse também nosso site!`;
+
+      // Envia a lista formatada no chat do WhatsApp
+      msg.reply(resposta);
+    });
+  }
+});
+
+// Inicializa o Bot junto com o servidor Express
+client.initialize();
+
 // 4. LIGANDO O SERVIDOR
 const PORT = 3000;
 app.listen(PORT, () => {
